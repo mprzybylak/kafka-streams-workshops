@@ -14,7 +14,7 @@ class Exercise2_BasicFunctions extends FlatSpec with Matchers {
   val strings: Serde[String] = Serdes.String()
   val integers: Serde[Integer] = Serdes.Integer()
 
-  it should "capitalize first letter of words from input stream and pass it to output stream" in {
+  it should "capitalize first letter of words from input topic and pass it to output topic" in {
 
     val inputTopic = Seq(("1", "lorem"), ("2", "ipsum"), ("3", "dolor"), ("4", "sit"), ("5", "amet"))
     val expectedOutputTopic = Seq(("1", "Lorem"), ("2", "Ipsum"), ("3", "Dolor"), ("4", "Sit"), ("5", "Amet"))
@@ -33,7 +33,7 @@ class Exercise2_BasicFunctions extends FlatSpec with Matchers {
       .output("topic-expectedOutputTopic", strings, strings, expectedOutputTopic.size) shouldEqual expectedOutputTopic
   }
 
-  it should "filter out odd numbers from input stream" in {
+  it should "filter out odd numbers from input topic" in {
     val in = Seq[(String, Integer)](("1", 1), ("2", 2), ("3", 3), ("4", 4), ("5", 5))
     val out = Seq(("2", 2), ("4", 4))
 
