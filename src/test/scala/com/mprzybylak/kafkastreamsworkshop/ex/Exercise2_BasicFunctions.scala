@@ -4,9 +4,8 @@ import java.util.Properties
 
 import com.madewithtea.mockedstreams.MockedStreams
 import org.apache.kafka.common.serialization.{Serde, Serdes}
-import org.apache.kafka.streams
-import org.apache.kafka.streams.{KeyValue, StreamsConfig}
-import org.apache.kafka.streams.kstream.{KStream, KStreamBuilder}
+import org.apache.kafka.streams.StreamsConfig
+import org.apache.kafka.streams.kstream.KStream
 import org.scalatest.{FlatSpec, Matchers}
 
 class Exercise2_BasicFunctions extends FlatSpec with Matchers {
