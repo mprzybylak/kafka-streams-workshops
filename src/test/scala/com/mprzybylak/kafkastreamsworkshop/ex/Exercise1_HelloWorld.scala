@@ -1,10 +1,6 @@
 package com.mprzybylak.kafkastreamsworkshop.ex
 
-import com.madewithtea.mockedstreams.MockedStreams
 import com.mprzybylak.kafkastreamsworkshop.internals.KafkaStreamsTest
-import org.apache.kafka.common.serialization.{Serde, Serdes}
-import org.apache.kafka.streams.kstream.KStreamBuilder
-import org.scalatest._
 
 class Exercise1_HelloWorld extends KafkaStreamsTest {
 
