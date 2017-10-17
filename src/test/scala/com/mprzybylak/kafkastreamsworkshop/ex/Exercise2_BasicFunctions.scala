@@ -15,18 +15,18 @@ class Exercise2_BasicFunctions extends KafkaStreamsTest {
     val inputTopic = Seq(("1", "lorem"), ("2", "ipsum"), ("3", "dolor"), ("4", "sit"), ("5", "amet"))
     val outputTopic = Seq(("1", "Lorem"), ("2", "Ipsum"), ("3", "Dolor"), ("4", "Sit"), ("5", "Amet"))
 
-    // `capitalize` method inputTopic class String allows to capitalize first letter
     MockedStreams()
       .topology(
         builder => {
-          val source: KStream[String, String] = builder.stream("topic-input")
+          // `capitalize` method inputTopic class String allows to capitalize first letter
+          val source: KStream[String, String] = builder.stream(INPUT_TOPIC_NAME)
           val map = source.mapValues(_.capitalize)
-          map.to("topic-output")
+          map.to(OUTPUT_TOPIC_NAME)
         }
       )
       .config(config(strings, strings))
-      .input("topic-inputTopic", strings, strings, inputTopic)
-      .output("topic-outputTopic", strings, strings, outputTopic.size) shouldEqual outputTopic
+      .input(INPUT_TOPIC_NAME, strings, strings, inputTopic)
+      .output(OUTPUT_TOPIC_NAME, strings, strings, outputTopic.size) shouldEqual outputTopic
   }
 
   it should "filter out odd numbers from input topic" in {
@@ -36,14 +36,14 @@ class Exercise2_BasicFunctions extends KafkaStreamsTest {
     MockedStreams()
       .topology(
         builder => {
-          val source: KStream[String, Integer] = builder.stream("topic-input")
+          val source: KStream[String, Integer] = builder.stream(INPUT_TOPIC_NAME)
           val map: KStream[String, Integer] = source.filter((k, v) => v % 2 == 0)
-          map.to("topic-out")
+          map.to(OUTPUT_TOPIC_NAME)
         }
       )
       .config(config(strings, integers))
-      .input("topic-inputTopic", strings, integers, inputTopic)
-      .output("topic-out", strings, integers, outputTopic.size) shouldEqual outputTopic
+      .input(INPUT_TOPIC_NAME, strings, integers, inputTopic)
+      .output(OUTPUT_TOPIC_NAME, strings, strings, outputTopic.size) shouldEqual outputTopic
   }
 
 
