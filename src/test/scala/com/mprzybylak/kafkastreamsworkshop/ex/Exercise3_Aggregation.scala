@@ -30,12 +30,9 @@ class Exercise3_Aggregation extends KafkaStreamsTest {
     MockedStreams()
       .topology(builder => {
         val source: KStream[String, String] = builder.stream(INPUT_TOPIC_NAME)
-        source.print()
         val group: KGroupedStream[String, String] = source.groupByKey(strings, strings)
         val count: KTable[String, java.lang.Long] = group.count("ticketCount")
-        count.print()
         val intCount:KTable[String, Integer] = count.mapValues(v => v.toInt)
-        intCount.print()
         intCount.toStream().to(strings, integers, OUTPUT_TOPIC_NAME)
       })
       .config(config(strings, strings))
