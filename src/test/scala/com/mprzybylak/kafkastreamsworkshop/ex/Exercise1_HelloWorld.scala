@@ -21,4 +21,17 @@ class Exercise1_HelloWorld extends KafkaStreamsTest {
       inputTopic, expectedOutputTopic)
   }
 
+  it should "show debug data on console" in {
+
+    val inputTopic = Seq(("1", "a"), ("2", "b"), ("3", "c"))
+    val expectedOutputTopic = Seq(("1", "a"), ("2", "b"), ("3", "c"))
+
+    test(
+      builder => {
+        // FIL ME
+      }, inputTopic, expectedOutputTopic
+    )
+
+  }
+
 }
