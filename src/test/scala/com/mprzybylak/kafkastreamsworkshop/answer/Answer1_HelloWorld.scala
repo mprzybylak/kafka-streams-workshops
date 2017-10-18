@@ -12,7 +12,9 @@ class Answer1_HelloWorld extends KafkaStreamsTest {
     test(
       builder => {
         // ANSWER
-        builder.stream("topic-in").to("topic-out")
+        builder
+          .stream("topic-in") // this is "source" processor - it subscribes to some topic
+          .to("topic-out") // this is "sink" processor - it push result of computation to some topic
       },
       inputTopic, expectedOutputTopic)
   }
