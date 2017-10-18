@@ -1,7 +1,6 @@
 package com.mprzybylak.kafkastreamsworkshop.internals
 
-import java.text.SimpleDateFormat
-import java.time.{LocalDateTime, Month, ZoneId, ZoneOffset}
+import java.time.{LocalDateTime, Month, ZoneId}
 import java.util
 import java.util.{Date, Properties}
 
@@ -12,7 +11,6 @@ import org.apache.kafka.common.serialization.{Deserializer, Serde, Serdes, Seria
 import org.apache.kafka.streams.StreamsConfig
 import org.apache.kafka.streams.kstream.KStreamBuilder
 import org.apache.kafka.streams.processor.TimestampExtractor
-import org.apache.kafka.streams.processor.internals.ProcessorTopologyTest.CustomTimestampExtractor
 import org.scalatest.{FlatSpec, Matchers}
 
 class KafkaStreamsTest extends FlatSpec with Matchers {
@@ -34,7 +32,7 @@ class KafkaStreamsTest extends FlatSpec with Matchers {
     props
   }
 
-  protected def test(topologyBuilder : KStreamBuilder => Unit, in: Seq[(String, String)], out: Seq[(String, String)]): Unit = {
+  protected def test(topologyBuilder: KStreamBuilder => Unit, in: Seq[(String, String)], out: Seq[(String, String)]): Unit = {
     val strings: Serde[String] = Serdes.String()
     MockedStreams()
       .topology(topologyBuilder)
@@ -42,7 +40,7 @@ class KafkaStreamsTest extends FlatSpec with Matchers {
       .output(OUTPUT_TOPIC_NAME, strings, strings, out.size) shouldEqual out
   }
 
-  protected case class TemperatureMeasure(temperature:Int, timestamp:Long)
+  protected case class TemperatureMeasure(temperature: Int, timestamp: Long)
 
   protected object TemperatureMeasure {
     def apply(temperature: Int, hour: Int): TemperatureMeasure = {
@@ -68,7 +66,9 @@ class KafkaStreamsTest extends FlatSpec with Matchers {
     override def deserializer(): Deserializer[TemperatureMeasure] = {
       new Deserializer[TemperatureMeasure] {
         override def configure(configs: util.Map[String, _], isKey: Boolean): Unit = {}
+
         override def close(): Unit = {}
+
         override def deserialize(topic: String, data: Array[Byte]): TemperatureMeasure = {
           builder.fromJson(new String(data), TemperatureMeasure.getClass)
         }
@@ -78,6 +78,7 @@ class KafkaStreamsTest extends FlatSpec with Matchers {
     override def serializer(): Serializer[TemperatureMeasure] = {
       new Serializer[TemperatureMeasure] {
         override def configure(configs: util.Map[String, _], isKey: Boolean): Unit = {}
+
         override def close(): Unit = {}
 
         override def serialize(topic: String, data: TemperatureMeasure): Array[Byte] = {
@@ -126,9 +127,9 @@ class KafkaStreamsTest extends FlatSpec with Matchers {
   }
 
   protected class AggregatedTemperature {
-    var temps :List[Int] = List()
+    var temps: List[Int] = List()
 
-    def add(temperature :Int) = {
+    def add(temperature: Int) = {
       temps = temperature :: temps
     }
 
@@ -136,4 +137,5 @@ class KafkaStreamsTest extends FlatSpec with Matchers {
       temps.sum / temps.length
     }
   }
+
 }

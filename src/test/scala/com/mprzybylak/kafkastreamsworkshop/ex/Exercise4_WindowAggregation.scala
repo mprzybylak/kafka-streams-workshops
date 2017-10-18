@@ -56,12 +56,13 @@ class Exercise4_WindowAggregation extends KafkaStreamsTest {
 
     MockedStreams()
       .topology(
-        builder =>
-        {
+        builder => {
           val source: KStream[String, java.lang.Integer] = builder.stream(INPUT_TOPIC_NAME)
           val group: KGroupedStream[String, java.lang.Integer] = source.groupByKey(strings, integers)
 
-          val aggregator: Aggregator[String, Integer, AggregatedTemperature] = (k: String, v: Integer, a: AggregatedTemperature) => {a.add(v); a}
+          val aggregator: Aggregator[String, Integer, AggregatedTemperature] = (k: String, v: Integer, a: AggregatedTemperature) => {
+            a.add(v); a
+          }
 
           val aggregate: KTable[Windowed[String], AggregatedTemperature] = group.aggregate(
             () => new AggregatedTemperature(),
@@ -71,8 +72,8 @@ class Exercise4_WindowAggregation extends KafkaStreamsTest {
             "temperature-store"
           )
 
-          val aggregatedStream: KStream[String, AggregatedTemperature] = aggregate.toStream((k:Windowed[String], v:AggregatedTemperature) => k.key())
-          val aggregatedStreamMapped: KStream[String, Integer] = aggregatedStream.mapValues((t:AggregatedTemperature) => t.average())
+          val aggregatedStream: KStream[String, AggregatedTemperature] = aggregate.toStream((k: Windowed[String], v: AggregatedTemperature) => k.key())
+          val aggregatedStreamMapped: KStream[String, Integer] = aggregatedStream.mapValues((t: AggregatedTemperature) => t.average())
           aggregatedStreamMapped.to(strings, integers, OUTPUT_TOPIC_NAME)
 
         }

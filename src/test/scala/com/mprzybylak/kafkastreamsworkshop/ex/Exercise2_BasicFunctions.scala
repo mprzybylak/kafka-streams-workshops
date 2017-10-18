@@ -46,5 +46,4 @@ class Exercise2_BasicFunctions extends KafkaStreamsTest {
       .output(OUTPUT_TOPIC_NAME, strings, strings, outputTopic.size) shouldEqual outputTopic
   }
 
-
 }
