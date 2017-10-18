@@ -11,7 +11,5 @@ libraryDependencies ++= Seq(
   "ch.qos.logback" % "logback-core" % "1.0.13",
   "org.scalatest" %% "scalatest" % "3.0.4" % "test",
   "com.madewithtea" %% "mockedstreams" % "1.4.0" % "test",
-  "io.circe" %% "circe-core" % "0.8.0",
-  "io.circe" %% "circe-generic" % "0.8.0",
-  "io.circe" %% "circe-parser" % "0.8.0"
+  "com.google.code.gson" % "gson" % "2.8.2"
 )
