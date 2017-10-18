@@ -12,7 +12,7 @@ class Exercise1_HelloWorld extends KafkaStreamsTest {
     test(
       builder => {
         // INPUT_TOPIC_NAME / OUTPUT_TOPIC_NAME values contains names of topic to use
-        // FILE ME
+        // FILL ME
       },
       inputTopic, expectedOutputTopic)
   }
@@ -24,7 +24,7 @@ class Exercise1_HelloWorld extends KafkaStreamsTest {
 
     test(
       builder => {
-        // FIL ME
+        // FILL ME
       }, inputTopic, expectedOutputTopic
     )
 
