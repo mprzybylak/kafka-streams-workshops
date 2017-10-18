@@ -39,7 +39,6 @@ class Exercise3_Aggregation extends KafkaStreamsTest {
       .input(INPUT_TOPIC_NAME, strings, strings, inputTopic)
       .output(OUTPUT_TOPIC_NAME, strings, integers, outputTopic.size) shouldEqual outputTopic
 
-
   }
 
 }
