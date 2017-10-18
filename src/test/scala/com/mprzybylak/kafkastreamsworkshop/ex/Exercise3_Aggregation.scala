@@ -40,4 +40,50 @@ class Exercise3_Aggregation extends KafkaStreamsTest {
       .output(OUTPUT_TOPIC_NAME, strings, integers, outputTopic.size) shouldEqual outputTopic
   }
 
+  it should "find maximum high score on flipper machine per user" in {
+
+    // GIVEN
+    val inputTopic = Seq[(String, Integer)](
+      ("user1", 101), // key = player name; value = score
+      ("johny16", 212),
+      ("johny16", 512),
+      ("johny16", 300),
+      ("user1", 1000),
+      ("asdf", 24),
+      ("user1", 1112),
+      ("asdf", 0),
+      ("johny16", 680),
+      ("user1", 900)
+    )
+
+    val outputTopic = Seq[(String, Integer)](
+      ("user1", 101),
+      ("johny16", 212),
+      ("johny16", 512),
+      ("johny16", 512),
+      ("user1", 1000),
+      ("asdf", 24),
+      ("user1", 1112),
+      ("asdf", 24),
+      ("johny16", 680),
+      ("user1", 1112),
+    )
+
+    MockedStreams()
+
+      //WHEN
+      .topology(builder => {
+      val source: KStream[String, Integer] = builder.stream(INPUT_TOPIC_NAME)
+      val group: KGroupedStream[String, Integer] = source.groupByKey(strings, integers)
+      val max: KTable[String, Integer] = group.reduce((val1, val2) => if (val1 >= val2) val1 else val2)
+      max.toStream.to(strings, integers, OUTPUT_TOPIC_NAME)
+      })
+      .config(config(strings, integers))
+      .input(INPUT_TOPIC_NAME, strings, integers, inputTopic)
+
+      // THEN
+      .output(OUTPUT_TOPIC_NAME, strings, integers, outputTopic.size) shouldEqual outputTopic
+  }
+
+  // TODO aggregate
 }
