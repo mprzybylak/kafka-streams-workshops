@@ -13,3 +13,5 @@ libraryDependencies ++= Seq(
   "com.madewithtea" %% "mockedstreams" % "1.4.0" % "test",
   "com.google.code.gson" % "gson" % "2.8.2"
 )
+
+parallelExecution in Test := false
