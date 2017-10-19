@@ -3,7 +3,7 @@ package com.mprzybylak.kafkastreamsworkshop.ex
 import com.madewithtea.mockedstreams.MockedStreams
 import com.mprzybylak.kafkastreamsworkshop.internals.KafkaStreamsTest
 import org.apache.kafka.common.serialization.{Serde, Serdes}
-import org.apache.kafka.streams.kstream.KStream
+import org.apache.kafka.streams.kstream.{KStream, ValueMapper}
 
 class Exercise2_BasicFunctions extends KafkaStreamsTest {
 
@@ -54,12 +54,14 @@ class Exercise2_BasicFunctions extends KafkaStreamsTest {
       .input(INPUT_TOPIC_NAME, strings, integers, inputTopic)
 
       // THEN
-      .output(OUTPUT_TOPIC_NAME, strings, strings, outputTopic.size) shouldEqual outputTopic
+      .output(OUTPUT_TOPIC_NAME, strings, integers, outputTopic.size) shouldEqual outputTopic
   }
 
-  "blog engine" should "log each request from request topic" in {
+  it should "log each request to blogging platform from request topic" in {
 
     // GIVEN
+    val requestLogger = new RequestLogger() // use this class to log requests
+
     val inputTopic: Seq[(Integer, String)] = Seq(
       (12, "GET /posts"), // key = userId, value = request
       (88, "GET /posts/72"),
@@ -67,9 +69,8 @@ class Exercise2_BasicFunctions extends KafkaStreamsTest {
       (34, "POST /posts/72/comment { user: xyz, comment: I disagree }"),
       (72, "DELETE /posts/72/comment/15")
     )
-    // TODO ADD LOGGER
 
-    val expectedLogs:Seq[String] = Seq[String](
+    val expectedLogs: Seq[String] = Seq[String](
       "Request from user 12: GET /posts",
       "Request from user 88: GET /posts/72",
       "Request from user 72: POST /posts/72/comment { user: abc, comment: good article }",
@@ -80,14 +81,47 @@ class Exercise2_BasicFunctions extends KafkaStreamsTest {
     MockedStreams()
 
       // WHEN
-      .topology(builder => {})
+      .topology(
+        builder => {
+          builder.stream(INPUT_TOPIC_NAME)
+            .foreach((k, v) => requestLogger.log(k, v))
+        })
       .config(config(integers, strings))
       .input(INPUT_TOPIC_NAME, integers, strings, inputTopic)
+      .output(OUTPUT_TOPIC_NAME, integers, strings, expectedLogs.size)
 
-
-    // TODO assert logs
+    // THEN
+    requestLogger.logList() shouldEqual expectedLogs
   }
 
-  // TODO flatmapvalues
+  it should "spilit stream of sentences into stream of words" in {
 
+    // GIVEN
+    val inputTopic: Seq[(Integer, String)] = Seq[(Integer, String)](
+      (1, "Lorem ipsum dolor sit amet, consectetur adipiscing elit."),
+      (2, "Nulla euismod dui orci, porta bibendum sem aliquam quis."),
+      (3, "Nam volutpat ultrices mauris vel rhoncus")
+    )
+
+    val expectedOutput: Seq[(Integer, String)] = Seq[(Integer, String)](
+      (1, "Lorem"), (1, "ipsum"), (1, "dolor"), (1, "sit"), (1, "amet,"), (1, "consectetur"), (1, "adipiscing"), (1, "elit."),
+      (2, "Nulla"), (2, "euismod"), (2, "dui"), (2, "orci,"), (2, "porta"), (2, "bibendum"), (2, "sem"), (2, "aliquam"), (2, "quis."),
+      (3, "Nam"), (3, "volutpat"), (3, "ultrices"), (3, "mauris"), (3, "vel"), (3, "rhoncus")
+    )
+
+    MockedStreams()
+      .topology(
+        builder => {
+          val stream: KStream[Integer, String] = builder.stream(INPUT_TOPIC_NAME)
+
+          val stringToStringses: ValueMapper[String, java.util.List[String]] = (k: String) => java.util.Arrays.asList(k.split(" "): _*)
+          val flatMapValue: KStream[Integer, String] = stream.flatMapValues(stringToStringses)
+
+          flatMapValue.to(OUTPUT_TOPIC_NAME)
+        }
+      )
+      .config(config(integers, strings))
+      .input(INPUT_TOPIC_NAME, integers, strings, inputTopic)
+      .output(OUTPUT_TOPIC_NAME, integers, strings, expectedOutput.size)
+  }
 }

@@ -138,4 +138,16 @@ class KafkaStreamsTest extends FlatSpec with Matchers {
     }
   }
 
+  protected class RequestLogger {
+    var logs: List[String] = List()
+
+    def log(userId: Int, logEntry: String): Unit = {
+      logs = s"Request from user $userId: $logEntry" :: logs
+    }
+
+    def logList(): List[String] = {
+      logs.reverse
+    }
+  }
+
 }
