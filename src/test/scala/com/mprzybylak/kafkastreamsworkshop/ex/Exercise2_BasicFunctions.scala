@@ -63,8 +63,8 @@ class Exercise2_BasicFunctions extends KafkaStreamsTest {
     val inputTopic: Seq[(Integer, String)] = Seq(
       (12, "GET /posts"), // key = userId, value = request
       (88, "GET /posts/72"),
-      (72, "POST /posts/72/comment { user: abc, comment: good article"),
-      (34, "POST /posts/72/comment { user: xyz, comment: I disagree"),
+      (72, "POST /posts/72/comment { user: abc, comment: good article }"),
+      (34, "POST /posts/72/comment { user: xyz, comment: I disagree }"),
       (72, "DELETE /posts/72/comment/15")
     )
     // TODO ADD LOGGER
@@ -72,8 +72,8 @@ class Exercise2_BasicFunctions extends KafkaStreamsTest {
     val expectedLogs:Seq[String] = Seq[String](
       "Request from user 12: GET /posts",
       "Request from user 88: GET /posts/72",
-      "Request from user 72: POST /posts/72/comment { user: abc, comment: good article",
-      "Request from user 34: POST /posts/72/comment { user: xyz, comment: I disagree",
+      "Request from user 72: POST /posts/72/comment { user: abc, comment: good article }",
+      "Request from user 34: POST /posts/72/comment { user: xyz, comment: I disagree }",
       "Request from user 72: DELETE /posts/72/comment/15",
     )
 

@@ -129,11 +129,11 @@ class KafkaStreamsTest extends FlatSpec with Matchers {
   protected class AggregatedTemperature {
     var temps: List[Int] = List()
 
-    def add(temperature: Int) = {
+    def add(temperature: Int): Unit = {
       temps = temperature :: temps
     }
 
-    def average() = {
+    def average(): Int = {
       temps.sum / temps.length
     }
   }
