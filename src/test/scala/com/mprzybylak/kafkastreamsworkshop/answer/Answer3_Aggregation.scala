@@ -1,11 +1,11 @@
-package com.mprzybylak.kafkastreamsworkshop.ex
+package com.mprzybylak.kafkastreamsworkshop.answer
 
 import com.madewithtea.mockedstreams.MockedStreams
 import com.mprzybylak.kafkastreamsworkshop.internals.KafkaStreamsTest
 import org.apache.kafka.common.serialization.{Serde, Serdes}
 import org.apache.kafka.streams.kstream.{KGroupedStream, KStream, KTable}
 
-class Exercise3_Aggregation extends KafkaStreamsTest {
+class Answer3_Aggregation extends KafkaStreamsTest {
 
   val strings: Serde[String] = Serdes.String()
   val integers: Serde[Integer] = Serdes.Integer()
@@ -32,7 +32,25 @@ class Exercise3_Aggregation extends KafkaStreamsTest {
 
     MockedStreams()
       .topology(builder => {
-        // FILL ME
+
+        // create kstream from input topic
+        val source: KStream[String, String] = builder.stream(INPUT_TOPIC_NAME)
+
+        // in order to perform aggregation operation we always need to start from call to group or groupByKey methods
+        // those methods will gather entries with the same key to the same partition. so we can work on that later
+        val group: KGroupedStream[String, String] = source.groupByKey(strings, strings)
+
+        // count method will create so called KTable - we cat treat it as a view of current state in some point of time
+        // (as a result of aggregation of events from stream to this point of time). In this particular case - count
+        // method creates KTable that stores pair - key - and count (how much events with given key arrived up to the
+        // some specific point of time)
+        val count: KTable[String, java.lang.Long] = group.count("ticketCount")
+
+        // just a transformation from Long to Integer - nothing fancy here
+        val intCount: KTable[String, Integer] = count.mapValues(v => v.toInt)
+
+        // write result to output stream
+        intCount.toStream().to(strings, integers, OUTPUT_TOPIC_NAME)
       })
       .config(config(strings, strings))
       .input(INPUT_TOPIC_NAME, strings, strings, inputTopic)
@@ -72,7 +90,24 @@ class Exercise3_Aggregation extends KafkaStreamsTest {
 
       //WHEN
       .topology(builder => {
-        // FILL ME
+
+        // create KStream from input topic
+        val source: KStream[String, Integer] = builder.stream(INPUT_TOPIC_NAME)
+
+        // as mentioned in previous exercise - we need start aggregation with grouping operation
+        val group: KGroupedStream[String, Integer] = source.groupByKey(strings, integers)
+
+        // reduce method is method that allows us to create results over some sets of data in such way that:
+        // reduce will take first and second item in data set and combine it with given lambda (in our case lambda
+        // calculates max value).
+        // from this point reduce will take result of previous step and the next element of data set - and combine it
+        // with the same passed lambda
+        // reduce will continue with this algorithm until reach end of dataset
+        // in our case it will be currently available data in stream
+        val max: KTable[String, Integer] = group.reduce((val1, val2) => if (val1 >= val2) val1 else val2)
+
+        // store results in output topic
+        max.toStream.to(strings, integers, OUTPUT_TOPIC_NAME)
       })
       .config(config(strings, integers))
       .input(INPUT_TOPIC_NAME, strings, integers, inputTopic)
