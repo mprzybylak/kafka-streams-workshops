@@ -87,6 +87,4 @@ class Exercise3_Aggregation extends KafkaStreamsTest {
       // THEN
       .output(OUTPUT_TOPIC_NAME, strings, integers, outputTopic.size) shouldEqual outputTopic
   }
-
-  // TODO aggreagation on group table
 }

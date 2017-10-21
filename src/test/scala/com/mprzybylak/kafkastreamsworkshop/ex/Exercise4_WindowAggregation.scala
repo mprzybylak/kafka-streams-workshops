@@ -129,6 +129,5 @@ class Exercise4_WindowAggregation extends KafkaStreamsTest {
       .config(config(strings, integers, classOf[TemperatureMeasureTimestampExtractor].getName))
       .input(INPUT_TOPIC_NAME, strings, temperatures, inputTopic)
       .output(OUTPUT_TOPIC_NAME, strings, integers, outputTopic.size) shouldEqual outputTopic
-
   }
 }
