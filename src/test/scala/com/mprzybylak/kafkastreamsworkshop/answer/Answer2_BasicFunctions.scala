@@ -1,11 +1,11 @@
-package com.mprzybylak.kafkastreamsworkshop.ex
+package com.mprzybylak.kafkastreamsworkshop.answer
 
 import com.madewithtea.mockedstreams.MockedStreams
 import com.mprzybylak.kafkastreamsworkshop.internals.KafkaStreamsTest
 import org.apache.kafka.common.serialization.{Serde, Serdes}
 import org.apache.kafka.streams.kstream.{KStream, ValueMapper}
 
-class Exercise2_BasicFunctions extends KafkaStreamsTest {
+class Answer2_BasicFunctions extends KafkaStreamsTest {
 
   val strings: Serde[String] = Serdes.String()
   val integers: Serde[Integer] = Serdes.Integer()
@@ -21,7 +21,15 @@ class Exercise2_BasicFunctions extends KafkaStreamsTest {
       // WHEN
       .topology(
         builder => {
-          // FILL ME
+
+          // create kstream from topic
+          val source: KStream[String, String] = builder.stream(INPUT_TOPIC_NAME)
+
+          // method mapValues allows to transform values in stream (without touching keys)
+          val map = source.mapValues(_.capitalize)
+
+          // store results in output topic
+          map.to(OUTPUT_TOPIC_NAME)
         }
       )
       .config(config(strings, strings))
@@ -42,7 +50,17 @@ class Exercise2_BasicFunctions extends KafkaStreamsTest {
       // WHEN
       .topology(
         builder => {
-          // FILL ME
+
+          // create kstream from topic
+          val source: KStream[String, Integer] = builder.stream(INPUT_TOPIC_NAME)
+
+          // method filter allows to filter elements based on key and/or values
+          // if we return true - current key-value pair will advance to the next processor
+          // if we return false - current key-value pair will not advance to the next processor
+          val filter: KStream[String, Integer] = source.filter((k, v) => v % 2 == 0)
+
+          // store results in output topic
+          filter.to(OUTPUT_TOPIC_NAME)
         }
       )
       .config(config(strings, integers))
@@ -78,7 +96,14 @@ class Exercise2_BasicFunctions extends KafkaStreamsTest {
       // WHEN
       .topology(
         builder => {
-          // FILL ME
+
+          // create kstream from topic
+          val source: KStream[Integer, String] = builder.stream(INPUT_TOPIC_NAME)
+
+          // foreach method allows you to perform action, well - for each element in stream
+          // it is so called terminal operation. That means that after it there will be no more processing
+          // you cannot attach another processor after it (even sink)
+          source.foreach((k, v) => requestLogger.log(k, v))
         })
       .config(config(integers, strings))
       .input(INPUT_TOPIC_NAME, integers, strings, inputTopic)
@@ -106,7 +131,19 @@ class Exercise2_BasicFunctions extends KafkaStreamsTest {
     MockedStreams()
       .topology(
         builder => {
-          // FILL ME
+
+          // create kstream from input topic
+          val stream: KStream[Integer, String] = builder.stream(INPUT_TOPIC_NAME)
+
+          // function String -> java.util.List[String] we will use it to split setences into list of words
+          val stringToWords: ValueMapper[String, java.util.List[String]] = (k: String) => java.util.Arrays.asList(k.split(" "): _*)
+
+          // even if our stringToWords is returning List of Strings - the flat maps will "unpack" those Lists
+          // so we still have Integer->String stream here
+          val flatMapValue: KStream[Integer, String] = stream.flatMapValues(stringToWords)
+
+          // store results in output topic
+          flatMapValue.to(OUTPUT_TOPIC_NAME)
         }
       )
       .config(config(integers, strings))
