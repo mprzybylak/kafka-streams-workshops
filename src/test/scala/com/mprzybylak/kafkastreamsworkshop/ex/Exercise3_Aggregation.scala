@@ -11,6 +11,9 @@ class Exercise3_Aggregation extends KafkaStreamsTest {
   val integers: Serde[Integer] = Serdes.Integer()
   val longs: Serde[java.lang.Long] = Serdes.Long()
 
+  private val BCN = "Barcelona"
+  private val MUN = "Munich"
+
   it should "group input stream of concert ticket sold" in {
 
     // key = band name
@@ -73,10 +76,10 @@ class Exercise3_Aggregation extends KafkaStreamsTest {
 
       //WHEN
       .topology(builder => {
-      val source: KStream[String, Integer] = builder.stream(INPUT_TOPIC_NAME)
-      val group: KGroupedStream[String, Integer] = source.groupByKey(strings, integers)
-      val max: KTable[String, Integer] = group.reduce((val1, val2) => if (val1 >= val2) val1 else val2)
-      max.toStream.to(strings, integers, OUTPUT_TOPIC_NAME)
+        val source: KStream[String, Integer] = builder.stream(INPUT_TOPIC_NAME)
+        val group: KGroupedStream[String, Integer] = source.groupByKey(strings, integers)
+        val max: KTable[String, Integer] = group.reduce((val1, val2) => if (val1 >= val2) val1 else val2)
+        max.toStream.to(strings, integers, OUTPUT_TOPIC_NAME)
       })
       .config(config(strings, integers))
       .input(INPUT_TOPIC_NAME, strings, integers, inputTopic)
@@ -85,5 +88,5 @@ class Exercise3_Aggregation extends KafkaStreamsTest {
       .output(OUTPUT_TOPIC_NAME, strings, integers, outputTopic.size) shouldEqual outputTopic
   }
 
-  // TODO aggregate
+  // TODO aggreagation on group table
 }

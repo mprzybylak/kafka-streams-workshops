@@ -6,12 +6,12 @@ import java.util.{Date, Properties}
 
 import com.google.gson.{Gson, GsonBuilder}
 import com.madewithtea.mockedstreams.MockedStreams
-import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.common.serialization.{Deserializer, Serde, Serdes, Serializer}
 import org.apache.kafka.streams.StreamsConfig
 import org.apache.kafka.streams.kstream.KStreamBuilder
-import org.apache.kafka.streams.processor.TimestampExtractor
 import org.scalatest.{FlatSpec, Matchers}
+
+import scala.language.implicitConversions
 
 class KafkaStreamsTest extends FlatSpec with Matchers {
 
@@ -49,15 +49,7 @@ class KafkaStreamsTest extends FlatSpec with Matchers {
     }
   }
 
-  protected class TemperatureMeasureTimestampExtractor() extends TimestampExtractor {
 
-    override def extract(record: ConsumerRecord[AnyRef, AnyRef], previousTimestamp: Long): Long = {
-      record.value() match {
-        case v: TemperatureMeasure => v.timestamp
-        case _ => throw new ClassCastException
-      }
-    }
-  }
 
   protected class TemperatiureMeasureSerde extends Serde[TemperatureMeasure] {
 
@@ -70,7 +62,7 @@ class KafkaStreamsTest extends FlatSpec with Matchers {
         override def close(): Unit = {}
 
         override def deserialize(topic: String, data: Array[Byte]): TemperatureMeasure = {
-          builder.fromJson(new String(data), TemperatureMeasure.getClass)
+          builder.fromJson(new String(data), classOf[TemperatureMeasure])
         }
       }
     }
@@ -126,16 +118,26 @@ class KafkaStreamsTest extends FlatSpec with Matchers {
     override def close(): Unit = {}
   }
 
-  protected class AggregatedTemperature {
-    var temps: List[Int] = List()
+  protected class AggregatedTemperature(t: java.util.List[Integer]) {
 
-    def add(temperature: Int): Unit = {
-      temps = temperature :: temps
+    var temps: java.util.List[Integer] = t
+
+    def this() = {
+      this(new util.ArrayList[Integer]())
     }
 
-    def average(): Int = {
-      temps.sum / temps.length
+    def add(temperature: Integer): AggregatedTemperature = {
+      temps.add(temperature)
+      this
     }
+
+    def average(): Integer = {
+      var sum = 0;
+      temps.forEach(i => sum+=i)
+      sum/temps.size()
+    }
+
+    override def toString: String = "[Temperature: " + temps + ", average:" + average() + "]"
   }
 
   protected class RequestLogger {

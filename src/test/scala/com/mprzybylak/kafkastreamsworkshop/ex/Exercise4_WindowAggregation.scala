@@ -1,7 +1,7 @@
 package com.mprzybylak.kafkastreamsworkshop.ex
 
 import com.madewithtea.mockedstreams.MockedStreams
-import com.mprzybylak.kafkastreamsworkshop.internals.KafkaStreamsTest
+import com.mprzybylak.kafkastreamsworkshop.internals.{KafkaStreamsTest, TemperatureMeasureTimestampExtractor}
 import org.apache.kafka.common.serialization.{Serde, Serdes}
 import org.apache.kafka.streams.kstream._
 
@@ -22,46 +22,40 @@ class Exercise4_WindowAggregation extends KafkaStreamsTest {
     val inputTopic = Seq[(String, TemperatureMeasure)](
 
       // FIRST WINDOW
-      (BCN, TemperatureMeasure(24, 1)),
-      (MUN, TemperatureMeasure(15, 2)),
-      (BCN, TemperatureMeasure(24, 3)),
-      (MUN, TemperatureMeasure(17, 4)),
-      (BCN, TemperatureMeasure(22, 5)),
+      (BCN, TemperatureMeasure(temperature = 24, hour = 0)),
+      (MUN, TemperatureMeasure(15, 1)),
+      (BCN, TemperatureMeasure(24, 2)),
+      (MUN, TemperatureMeasure(17, 3)),
 
       // SECOND WINDOW
-      (MUN, TemperatureMeasure(18, 6)),
-      (BCN, TemperatureMeasure(24, 7)),
-      (MUN, TemperatureMeasure(15, 8)),
-      (BCN, TemperatureMeasure(26, 9)),
-      (MUN, TemperatureMeasure(13, 10)),
-
-      // THIRD WINDOW
-      (BCN, TemperatureMeasure(28, 11)),
-      (MUN, TemperatureMeasure(15, 12)),
-      (BCN, TemperatureMeasure(25, 13)),
-      (MUN, TemperatureMeasure(12, 14)),
-      (BCN, TemperatureMeasure(24, 15)),
-
-      // FOURTH WINDOW
-      (MUN, TemperatureMeasure(14, 16)),
-      (BCN, TemperatureMeasure(26, 17)),
-      (MUN, TemperatureMeasure(15, 18)),
-      (BCN, TemperatureMeasure(21, 19)),
-      (MUN, TemperatureMeasure(11, 20)),
+      (BCN, TemperatureMeasure(22, 4)),
+      (MUN, TemperatureMeasure(18, 5)),
+      (BCN, TemperatureMeasure(24, 6)),
+      (MUN, TemperatureMeasure(15, 7)),
     )
 
-    val outputTopic = Seq[(String, java.lang.Double)](
-      ("Barcelona", 24D)
+    val outputTopic = Seq[(String, Integer)](
+
+      // FIRST WINDOW
+      (BCN, 24),
+      (MUN, 15),
+      (BCN, 24),
+      (MUN, 16),
+
+      // SECOND WINDOW
+      (BCN, 22),
+      (MUN, 18),
+      (BCN, 23),
+      (MUN, 16),
     )
 
     MockedStreams()
       .topology(
         builder => {
-          val source: KStream[String, java.lang.Integer] = builder.stream(INPUT_TOPIC_NAME)
-          val group: KGroupedStream[String, java.lang.Integer] = source.groupByKey(strings, integers)
-
-          val aggregator: Aggregator[String, Integer, AggregatedTemperature] = (k: String, v: Integer, a: AggregatedTemperature) => {
-            a.add(v); a
+          val source: KStream[String, TemperatureMeasure] = builder.stream(strings, temperatures, INPUT_TOPIC_NAME)
+          val group: KGroupedStream[String, TemperatureMeasure] = source.groupByKey(strings, temperatures)
+          val aggregator: Aggregator[String, TemperatureMeasure, AggregatedTemperature] = (k: String, v: TemperatureMeasure, a: AggregatedTemperature) => {
+            a.add(v.temperature)
           }
 
           val aggregate: KTable[Windowed[String], AggregatedTemperature] = group.aggregate(
@@ -85,11 +79,56 @@ class Exercise4_WindowAggregation extends KafkaStreamsTest {
   }
 
   it should "calculate average temperature for 5 hours window hopping each 2 hours" in {
-    // TODO implement
-  }
 
-  it should "calculate average temperature for 5 hours sliding window" in {
-    // TODO how to prepare sliding window for kafka streams?
-  }
+    val inputTopic = Seq[(String, TemperatureMeasure)](
+      (BCN, TemperatureMeasure(temperature = 24, hour = 0)),
+      (MUN, TemperatureMeasure(15, 1)),
+      (BCN, TemperatureMeasure(24, 2)),
+      (MUN, TemperatureMeasure(17, 3)),
+      (BCN, TemperatureMeasure(22, 4)),
+      (MUN, TemperatureMeasure(18, 5)),
+      (BCN, TemperatureMeasure(24, 6)),
+      (MUN, TemperatureMeasure(15, 7)),
+    )
 
+    val outputTopic = Seq[(String, Integer)](
+      (BCN, 24),
+      (MUN, 15),
+      (BCN, 24),
+      (BCN, 24),
+      (MUN, 17),
+      (BCN, 23),
+      (MUN, 17),
+      (BCN, 23),
+      (BCN, 24),
+      (MUN, 15),
+    )
+
+    MockedStreams()
+      .topology(
+        builder => {
+          val source: KStream[String, TemperatureMeasure] = builder.stream(strings, temperatures, INPUT_TOPIC_NAME)
+          val group: KGroupedStream[String, TemperatureMeasure] = source.groupByKey(strings, temperatures)
+          val aggregator: Aggregator[String, TemperatureMeasure, AggregatedTemperature] = (k: String, v: TemperatureMeasure, a: AggregatedTemperature) => {
+            a.add(v.temperature)
+          }
+
+          val aggregate: KTable[Windowed[String], AggregatedTemperature] = group.aggregate(
+            () => new AggregatedTemperature(),
+            aggregator,
+            TimeWindows.of(18000000).advanceBy(14400000),
+            new AggregatedTemperatureSerde(),
+            "temperature-store"
+          )
+          val aggregatedStream: KStream[String, AggregatedTemperature] = aggregate.toStream((k: Windowed[String], v: AggregatedTemperature) => k.key())
+          val aggregatedStreamMapped: KStream[String, Integer] = aggregatedStream.mapValues((t: AggregatedTemperature) => t.average())
+          aggregatedStreamMapped.to(strings, integers, OUTPUT_TOPIC_NAME)
+
+        }
+      )
+      .config(config(strings, integers, classOf[TemperatureMeasureTimestampExtractor].getName))
+      .input(INPUT_TOPIC_NAME, strings, temperatures, inputTopic)
+      .output(OUTPUT_TOPIC_NAME, strings, integers, outputTopic.size) shouldEqual outputTopic
+
+  }
 }
