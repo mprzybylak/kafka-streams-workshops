@@ -376,6 +376,6 @@ TODO exercises description
 - N. Narkhede - Exactly-once Semantics are Possible: Here’s How Kafka Does it(https://www.confluent.io/blog/exactly-once-semantics-are-possible-heres-how-apache-kafka-does-it/)
 - all the things under the "sources"
 
-## Sources
+## References
 - G. Shapira, T. Palino, N. Narkhede - Kafka: The Definitive Guide (ch.11 - Stream Processing)
 - Kafka Streams documentation on confluent.io (https://docs.confluent.io/current/streams/index.html)
