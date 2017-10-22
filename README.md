@@ -49,6 +49,13 @@ There are two APIs for Kafka Streams
 - Streams DSL (high level API)
 - Processor API (low level - not covered by this workshops)
 
+### Kafka streams scalability ###
+
+How kafka streams scale the topology
+- Kafka streams scale application either by spliting into multiple threads or to scale between multiple machines
+- Kafka streams divide stream into tasks - task contain group of procesor that can work in parallel
+- Number of tasks depends on number of partitions
+
 ## Exercises - Introduction
 
 Exercises in this workshops are designed as series of unit tests when there is a blank spot where one should provides implementation that allows test to pass. From technical point of view those are tests that are using MockStreams (https://github.com/jpzk/mockedstreams) library that allows you to unit test your topologies.
