@@ -133,6 +133,34 @@ In order to finish this task you will need to apply transformation on each eleme
 - `branch` allows you to send subset of values to one processor and others to another. In fact you can pass multiple predicates which will split stream into multiple branches. It is not possibe to have the same entry in couple of branches - it can be always in only one branch
 - `writeAsText` it is the terminal operation that stores records in file
 
+## Exercise 3 - Aggregation
+
+### Serdes
+
+Each time when data needs to be materialized in any way (eg read / write topic, transform data from one type to another) we need to provide a way to serialize / deserialize certain types. In kafka streams such operation are handled by so called "serdes" classes (**SER**ialize / **DE**serialize)
+
+The simplest scenario is to setup default key and value serdes with topology configuration with `default.key.serde` and `default.value.serde` configuration entries. In scope of this exercise each unit tests already specifies those values (that is way you was not bothered about serialization during first two exercises). And in case that every transformation in topology results with types that matches default serdes - there is no need to specify it manualy.
+
+In case if we have types that are not matching default serdes we need to specify them - many of the methods that creates processor allows you to pass key and value serdes - just take a look into method signature.
+
+Kafka streams allows you to use some set of serdes for most basic types by calling Serdes methods:
+- `Serdes.ByteArray()`, `Serdes.Bytes()` 
+- `Serdes.ByteBuffer()`
+- `Serdes.Double()`
+- `Serdes.Integer()`
+- `Serdes.Long()`
+- `Serdes.String()`
+
+In case if you would like to have serialization/deserialization over your custom type you need to implements your own serdes. It is outside of the scope of this exercise, since all custom types and serdes are provided, but just to let you know how to do that: You need to have a class that implemnts `org.apache.kafka.common.serialization.Serde` interface. This class will act like factory for serializers and deserializers - you need also provide those by implementing interfaces: `org.apache.kafka.common.serialization.Serializer` and `org.apache.kafka.common.serialization.Deserializer`
+
+### Methods to know
+
+### EX
+
+### Worth to know
+
+There are libraries designed to serialize/deserialize different types that already have support for kafka streams - for example Apache Avro
+
 ## Application scaffolding
 
 TODO: How to create topology. start/stop. handle errors, etc.
