@@ -243,7 +243,20 @@ When Kafka streams produce message it can process timestamp like this:
 
 ### Timestamp Extractors
 
-In order to extract data from 
+In order to extract data from record kafka stream will use object called TimestampExtractor. Timestamp extractor provides by kafka streams will read kafka timestamp. What time will be return depends on what are the settings:
+- if `log.message.timestamp.type` = `CreateTime` timestamp will be the time of message production (so called producer time)
+- if ``log.message.timestamp.type`` = `LogAppendTime` timestamp will be the time when broker stored message (so called broker time)
+
+There are couple of implementation that we can use:
+
+- `FailOnInvalidTimestamp` (default) - If timestamp will be invalid this extractor will throw exception
+- `LogAndSkipOnInvalidTimestamp` - in case of incorrect timestamp this extractor will log that event and drop the invalid message
+- `UsePreviousTimeOnInvalidTimestamp` - It will use last known correct timestamp in case of incorrect timestamp
+- `WallclockTimestampExtractor` - It will not extract any time at all - it will return current system time
+
+We can create our own timestamp extract which is usefull if timestamp that we want to use is embedded inside of record. In order to create our own timestamp extractor we need to implement `org.apache.kafka.streams.processor.TimestampExtractor` and either register it as default extractor or use it in method that allows to create windows.
+
+There are couple of option for dealing with errors
 
 ### Windows
 
