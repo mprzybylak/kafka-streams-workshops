@@ -25,7 +25,7 @@ There are multiple types of stream processing applications:
 
 **Processing with local state**. This kind of applications allows us to do so called windowed aggregations (we will cover concept of *aggregation* and *windows* later). Application need to have some sort of local state that allows to remember message values from the past in order to combine those with new messages. It might be tricky to recover after crash, because we will neet to restore local state somehow.
 
-**Combine results from multiple parts** This kind of processing might be considered similar to map-reduce type of algorithms. We process small chunks of data and later we will combine results.
+**Combine results from multiple sub processing** This kind of processing might be considered similar to map-reduce type of algorithms. We process small chunks of data and later we will combine results.
 
 **Stream-Table joins** In other words - we are processing stream and we need to lookup some other resources (like database) in order to enrich messages. This approach is challenging because stream processing is fast, but database lookup is slow. It is crucial to have some sort of caching, or ability to process database in some other form.
 
