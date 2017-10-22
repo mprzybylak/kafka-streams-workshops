@@ -25,6 +25,8 @@ Everything else should be more or less transparent for you. In some exercises yo
 
 Exercises are designed as a series of tasks - each task is separate unit test scenario in code and have separate description here. The name of the test and description from here should be clear enough for you to start to work on tasks. Before each exercise there will be (in this document) description of concepts that you need to know to pass tests. After each exercise it might be additional description of some other topics like things to remember, other api methods that is nice to know, etc.
 
+If you have problems with resolving exercises there is allso "answers" package in project where you can take a look for an example of how to resolve problem with additional comments explaining what is happening line by line
+
 ## Exercise 1 - Hello world
 
 TODO: Update link to unit test with exercise
@@ -66,9 +68,70 @@ GOAL: Be aware about `print` method that will help you with debuging.
 
 Almost all "nodes" of topology allows you to execute `print` method on it. Build the same topology as in previous task, but put print method in various processors and see what will happen at console.
 
-### Peek method
+### Worth to know: Peek method
 
 There is other useful method that you can use for debuging. It is called `peek` and allows you to apply some operation on key-value pairs, so you can perform more advanced debuging - better printing, logging, applying some conditional logic, etc.
+
+## Exercise 2 - Basic functions
+
+TODO: Update link to class with exercise
+
+There are four tasks:
+- Capitalize first letters of words
+- Filter our odd numbers
+- Execute external logic for each element in stream
+- Split sentences into the words
+
+### Function operations over streams
+
+There are couple of function operation that we need to understand in order to finish this exercise:
+- `map` / `mapValues`
+- `filter`
+- `foreach`
+- `flatMapValues`
+
+One of the most wide used thing in functional world is `map` semantic - it allows one to transform one form into another. It can be simple transformtion like multiply value by 2, or it can be transformation that change type - for example change from 2 to word "two". In Kafka streams we have two methods that allows us to use this semantic: `map` and `mapValues`. 
+
+The `mapValues` is very simple method that allows you transform only values. The benefit of this method is that it will never trigger repartioning (because keys will be not touched). Simple transformation of multiplying integer by two might looks like this: `map(i => i * 2)` 
+
+If we need to transform keys or both keys and values we should use `map` method. If key will be changed it will trigger repartitioning.
+
+The next important semantic is `filter` - it allows you to get rid of unwanted entries. The syntax of this method is very simple - we need to provide function that will take key and value and returns boolean value - if we return true - key-value pair will be pomoted to next processor. If it will be false - the pair will be dropped. example of filtering out numbers less than 10 would look like this: `filter((k,v) => x > 10)`
+
+If we want to apply some "external" logic on entries we can use `foreach` method. This method will execute function for every element in stream. This is so called terminal operation so you cannot attach next processor after that operation. The exmaple of using this function to save data into some database might looks like this: `foreach((k,v) => db.store(v))` where db would be some kind of class that handles real storing operation.
+
+`FlatMap` semantic looks very similar to map. The difference is that the result of transformation would be additionaly unpacked. That means if as a result of flat map like method we will get as a result `List[String]` it will be at the end unpacked - so the real return type will be just `String`
+
+### Exercise 2.1 - Basic functions - Capitalize
+
+GOAL: get to know with `map`/`mapValues` functions
+
+In order to finish this task you need to apply transformation on each element in input stream that will capitalize first letter and write result to output stream
+
+### Exercise 2.2 - Basic functions - Filtering odd numbers
+
+GOAL: get to know with `filter` method
+
+In order to finish this task you need to apply filtering on each element to determine if this is the odd or even number. All odd numbers should be removed from stream.
+
+### Exercise 2.3 - Basic functions - Applying logic for each element in stream
+
+GOAL: get to know with `foreach` method
+
+In order to finish this task you need to call `log` method on provided instance of fake `RequestLogger` class. You need to call this method for each records in input stream
+
+### Exercise 2.4 - Basic functions - Spliting sentences into the words
+
+GOAL: get to know with `flatMap` / `flatMapValues` 
+
+In order to finish this task you will need to apply transformation on each element of the stream. Transformation need to transform from string containing sentence into the collection of strings.
+
+### Good to know: Other methods
+
+- `filterNot` it acts like `filter` but applies negation on return value
+- `selectKey` allows you to assign new key to existing values
+- `branch` allows you to send subset of values to one processor and others to another. In fact you can pass multiple predicates which will split stream into multiple branches. It is not possibe to have the same entry in couple of branches - it can be always in only one branch
+- `writeAsText` it is the terminal operation that stores records in file
 
 ## Application scaffolding
 
