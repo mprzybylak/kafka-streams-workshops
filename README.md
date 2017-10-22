@@ -1,4 +1,4 @@
-# kafka-streams-worksops
+# Workshops: Kafka Streams
 
 ## Exercises - Introduction
 
