@@ -135,6 +135,12 @@ In order to finish this task you will need to apply transformation on each eleme
 
 ## Exercise 3 - Aggregation
 
+TODO: Update link to unit test with exercise
+
+There are two simple tasks:
+- Get to know how counting aggregation works
+- Get to know how perform more general aggregation
+
 ### Serdes
 
 Each time when data needs to be materialized in any way (eg read / write topic, transform data from one type to another) we need to provide a way to serialize / deserialize certain types. In kafka streams such operation are handled by so called "serdes" classes (**SER**ialize / **DE**serialize)
@@ -193,7 +199,22 @@ As mentioned before result of aggregation is stored inside `KTable` which basica
 
 The aggregation methods returns tables and those tables are stored in so called state stores. It can be anything from in memory hashmap up to local instance of RocksDB. Kafka streams takes care about fault tolerance - change log of stores will be propagated to special topics in kafka and by that it will be replicated accross the cluster. 
 
-### EX
+### Exercise 3.1 - Aggregation - Counting sold tickets
+
+GOAL: Get to know how aggregation works in general. Create most simple count aggregation
+
+In this task as input stream you will have list of events when someone ("value") is buying ticket to concert of some band ("key"). Our task is to count how much ticket for each band was bought.
+
+There are lots of new concepts here so it is important to remembers during resolving this task that:
+- Serdes - we will change types here so it is possible that you might need to provide serdes in some methods
+- In order to start aggregation at all `group` or `groupByKey` have to be called first
+- To count tickets at some point using `count()` 
+
+### Exercise 3.2 - Aggregation - Find maximum score
+
+GOAL: Get to know how to build more general aggregations
+
+The more general method to use for aggregation is `reduce` it is good when we would like to have aggregation value of the same type like the message's value in stream. In case of this tasks - value in stream is user's score, and we would like to return maxium score.
 
 ### Worth to know
 
