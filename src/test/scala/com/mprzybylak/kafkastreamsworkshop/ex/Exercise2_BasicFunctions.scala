@@ -105,12 +105,16 @@ class Exercise2_BasicFunctions extends KafkaStreamsTest {
 
     MockedStreams()
       .topology(
+
+        // WHEN
         builder => {
           // FILL ME
         }
       )
       .config(config(integers, strings))
       .input(INPUT_TOPIC_NAME, integers, strings, inputTopic)
+
+      // THEN
       .output(OUTPUT_TOPIC_NAME, integers, strings, expectedOutput.size)
   }
 }
