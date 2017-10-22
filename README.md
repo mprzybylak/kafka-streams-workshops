@@ -155,6 +155,8 @@ In case if you would like to have serialization/deserialization over your custom
 
 ### Tables
 
+
+
 ### Aggregation operations 
 
 To be able to perform aggregate operations you need to call one of the grouping method - more generic `group` or more specific `groupByKey`. With those method we will achieve two things:
@@ -187,10 +189,9 @@ We will emit result like this: `[["John", 1], ["Jane", 1], ["Jane", 2], ["Jane",
 
 As mentioned before result of aggregation is stored inside `KTable` which basically means that we can see current state of aggreegation at some point of time.
 
-
 ### Stores
 
-### Methods to know
+The aggregation methods returns tables and those tables are stored in so called state stores. It can be anything from in memory hashmap up to local instance of RocksDB. Kafka streams takes care about fault tolerance - change log of stores will be propagated to special topics in kafka and by that it will be replicated accross the cluster. 
 
 ### EX
 
