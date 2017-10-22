@@ -256,12 +256,39 @@ There are couple of implementation that we can use:
 
 We can create our own timestamp extract which is usefull if timestamp that we want to use is embedded inside of record. In order to create our own timestamp extractor we need to implement `org.apache.kafka.streams.processor.TimestampExtractor` and either register it as default extractor or use it in method that allows to create windows.
 
-There are couple of option for dealing with errors
+There are couple of option for dealing with invalid timestamp:
+- We can just throw exception
+- Return negative timestamp - what will casue drop of message
+- Use previous correct timestamp - it is available for us inside extractor
+- Do something else - like return current system time
 
 ### Windows
 
+Windows allows you to run aggregation operations on some subset of data. The decision about which messages should be considered is based on time. If the time of message is in between windows open and close time - it will be processed in the scope of this window. It is falls outside the windows open and close time - it will not be processed by this window, but it should exist other window that can catch this message.
+
+Features of windows:
+- Windows size - how much data we want to look at 
+- Advance interval - how often windows will move (eg. Each second, minute, each new event - still you can have window with size = 5 minutes, but different advance interval)
+- How long windows is updatable (retention period)? In case of so called late arrivals - window might be updated if still exists. The default value is one day and can be changed via Windows#until() and SessionWindows#until().
+- Window alignment - we can align window with time (eg. 00:00 is start of window), or not - new window will start when application starts. Sliding windows are not aligned by very definition
+
+Types of windows:
+- Tubmbling window - windows are not overlaping. windows are aligned to epoch with lower bound inclusive and upper bound exclusive
+- Hopping window - some subset of window is overlaping. windows are aligned to epoch with lower bound inclusive and upper bound exclusive
+- Sliding window - each new event provides new window. Sliding windows are used only for joins. it is not aligned to epoch and both lower and upper bound are inclusive
+
 ### Exercise 4.1 - Windowed Aggregation - Average temperature (Tumbling windows)
 
-TODO: Lots of serdes
+In this exercise we will use of some custom types, so be aware of using custom serdes. Don't be worry about creation of those, because those are already there:
+- for `TemperatureMeasure` class there is `TemperatureMeasureSerde`
+- for `AggregatedTemperature` class there is `AggregatedTemperatureSerde`
+
+In order to create windowed aggregate you will need to pass window to aggregate function. There is a factory method `TimeWindows.of(...)` that you will use for creation of tumbling window. It takes value in miliseconds that says how big window is.
+
+As a result of windowed aggregation you will get `KTable[Windowed[K], V]` object. Probably you would like to transform it later in some way to get something that is not typed with `Windowed[K]`
 
 ### Exercise 4.2 - Windowed Aggregation - Average temperature (Hopping windows)
+
+This task is basically the same as previous, but here we will count averages for 5h hopping windows with interval of 4h (so so part of windows will be overlaping). It is just a matter of create window with `TimeWindows.of(...).advanceBy(...)` **instead** of just calling `TimeWindows.of(...)`. 
+
+It is much much more important to understand overlaping of the windows, so try to add `print()` or `peek()` call at some point that allows you to see not only data but allso information about windows
