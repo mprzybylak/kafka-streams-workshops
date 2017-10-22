@@ -155,7 +155,7 @@ In case if you would like to have serialization/deserialization over your custom
 
 ### Tables
 
-
+Streams is an abstraction over unbounded set of data that comes over time. Tables are other way of looking at data. Tables contain current state of data at some point of the time. There is very close relationship between tables and streams. We called that "Duality of streams and tables".
 
 ### Aggregation operations 
 
@@ -198,6 +198,8 @@ The aggregation methods returns tables and those tables are stored in so called 
 ### Worth to know
 
 There are libraries designed to serialize/deserialize different types that already have support for kafka streams - for example Apache Avro
+
+We can convert table into the stream by calling `table.toStream` method
 
 ## Application scaffolding
 
