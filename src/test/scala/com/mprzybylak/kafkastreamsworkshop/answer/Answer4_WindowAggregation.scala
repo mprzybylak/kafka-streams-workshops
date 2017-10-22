@@ -11,7 +11,7 @@ class Answer4_WindowAggregation extends KafkaStreamsTest {
   val integers: Serde[Integer] = Serdes.Integer()
   val longs: Serde[java.lang.Long] = Serdes.Long()
   val doubles: Serde[java.lang.Double] = Serdes.Double()
-  val temperatures: TemperatiureMeasureSerde = new TemperatiureMeasureSerde
+  val temperatures: TemperatureMeasureSerde = new TemperatureMeasureSerde
   val aggregatedTemperatures: AggregatedTemperatureSerde = new AggregatedTemperatureSerde
 
   private val BCN = "Barcelona"

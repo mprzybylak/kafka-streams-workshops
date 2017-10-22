@@ -38,7 +38,7 @@ class Answer3_Aggregation extends KafkaStreamsTest {
 
         // in order to perform aggregation operation we always need to start from call to group or groupByKey methods
         // those methods will gather entries with the same key to the same partition. so we can work on that later
-        val group: KGroupedStream[String, String] = source.groupByKey(strings, strings)
+        val group: KGroupedStream[String, String] = source.groupByKey()
 
         // count method will create so called KTable - we cat treat it as a view of current state in some point of time
         // (as a result of aggregation of events from stream to this point of time). In this particular case - count

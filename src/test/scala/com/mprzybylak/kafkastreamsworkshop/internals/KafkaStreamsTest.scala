@@ -41,7 +41,7 @@ class KafkaStreamsTest extends FlatSpec with Matchers {
     }
   }
 
-  protected class TemperatiureMeasureSerde extends Serde[TemperatureMeasure] {
+  protected class TemperatureMeasureSerde extends Serde[TemperatureMeasure] {
 
     val builder: Gson = new GsonBuilder().create()
 
