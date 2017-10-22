@@ -374,7 +374,7 @@ TODO exercises description
 - T. Akidau - The world beyond batch: Streaming 102 (https://www.oreilly.com/ideas/the-world-beyond-batch-streaming-102)
 - M. Noll - Distributed, Real-time Joins and Aggregations on User Activity Events using Kafka Streams (https://www.confluent.io/blog/distributed-real-time-joins-and-aggregations-on-user-activity-events-using-kafka-streams/)
 - N. Narkhede - Exactly-once Semantics are Possible: Here’s How Kafka Does it(https://www.confluent.io/blog/exactly-once-semantics-are-possible-heres-how-apache-kafka-does-it/)
-- all the things under the "sources"
+- all the things under the "references"
 
 ## References
 - G. Shapira, T. Palino, N. Narkhede - Kafka: The Definitive Guide (ch.11 - Stream Processing)
