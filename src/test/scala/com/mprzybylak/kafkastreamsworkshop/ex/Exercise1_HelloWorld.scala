@@ -11,8 +11,8 @@ class Exercise1_HelloWorld extends KafkaStreamsTest {
 
     test(
       builder => {
-        // INPUT_TOPIC_NAME / OUTPUT_TOPIC_NAME values contains names of topic to use
         // FILL ME
+        // INPUT_TOPIC_NAME / OUTPUT_TOPIC_NAME values contains names of topic to use
       },
       inputTopic, expectedOutputTopic)
   }
