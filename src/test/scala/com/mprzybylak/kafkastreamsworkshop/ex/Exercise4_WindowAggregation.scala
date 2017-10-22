@@ -3,7 +3,6 @@ package com.mprzybylak.kafkastreamsworkshop.ex
 import com.madewithtea.mockedstreams.MockedStreams
 import com.mprzybylak.kafkastreamsworkshop.internals.{KafkaStreamsTest, TemperatureMeasureTimestampExtractor}
 import org.apache.kafka.common.serialization.{Serde, Serdes}
-import org.apache.kafka.streams.kstream._
 
 class Exercise4_WindowAggregation extends KafkaStreamsTest {
 
@@ -52,24 +51,7 @@ class Exercise4_WindowAggregation extends KafkaStreamsTest {
     MockedStreams()
       .topology(
         builder => {
-          val source: KStream[String, TemperatureMeasure] = builder.stream(strings, temperatures, INPUT_TOPIC_NAME)
-          val group: KGroupedStream[String, TemperatureMeasure] = source.groupByKey(strings, temperatures)
-          val aggregator: Aggregator[String, TemperatureMeasure, AggregatedTemperature] = (k: String, v: TemperatureMeasure, a: AggregatedTemperature) => {
-            a.add(v.temperature)
-          }
-
-          val aggregate: KTable[Windowed[String], AggregatedTemperature] = group.aggregate(
-            () => new AggregatedTemperature(),
-            aggregator,
-            TimeWindows.of(18000000),
-            new AggregatedTemperatureSerde(),
-            "temperature-store"
-          )
-
-          val aggregatedStream: KStream[String, AggregatedTemperature] = aggregate.toStream((k: Windowed[String], v: AggregatedTemperature) => k.key())
-          val aggregatedStreamMapped: KStream[String, Integer] = aggregatedStream.mapValues((t: AggregatedTemperature) => t.average())
-          aggregatedStreamMapped.to(strings, integers, OUTPUT_TOPIC_NAME)
-
+          // FILL ME
         }
       )
       .config(config(strings, integers, classOf[TemperatureMeasureTimestampExtractor].getName))
@@ -107,23 +89,7 @@ class Exercise4_WindowAggregation extends KafkaStreamsTest {
     MockedStreams()
       .topology(
         builder => {
-          val source: KStream[String, TemperatureMeasure] = builder.stream(strings, temperatures, INPUT_TOPIC_NAME)
-          val group: KGroupedStream[String, TemperatureMeasure] = source.groupByKey(strings, temperatures)
-          val aggregator: Aggregator[String, TemperatureMeasure, AggregatedTemperature] = (k: String, v: TemperatureMeasure, a: AggregatedTemperature) => {
-            a.add(v.temperature)
-          }
-
-          val aggregate: KTable[Windowed[String], AggregatedTemperature] = group.aggregate(
-            () => new AggregatedTemperature(),
-            aggregator,
-            TimeWindows.of(18000000).advanceBy(14400000),
-            new AggregatedTemperatureSerde(),
-            "temperature-store"
-          )
-          val aggregatedStream: KStream[String, AggregatedTemperature] = aggregate.toStream((k: Windowed[String], v: AggregatedTemperature) => k.key())
-          val aggregatedStreamMapped: KStream[String, Integer] = aggregatedStream.mapValues((t: AggregatedTemperature) => t.average())
-          aggregatedStreamMapped.to(strings, integers, OUTPUT_TOPIC_NAME)
-
+          // FILL ME
         }
       )
       .config(config(strings, integers, classOf[TemperatureMeasureTimestampExtractor].getName))
