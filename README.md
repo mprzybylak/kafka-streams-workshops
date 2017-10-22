@@ -1,5 +1,54 @@
 # Workshops: Kafka Streams
 
+## General concepts
+
+Before we will start the real workshops - let's start with some concepts that would be nice to know.
+
+### Streams
+
+In most general terms - stream is abstraction over unbound (infinite) data set. The most core features of streams are:
+- Streams are ordered
+- Immutable data
+- Replayable
+
+It is curcial to understand difference between processing data that is stream from processing data that looks like regular collection. First of all - in stream you don't know how much elements you have. Second thing is that you don't know when messages will appear on stream. Because of that you will need differently about some operations over stream than on the same operations over collections that you've already know.
+
+Especially aggregation operation looks totaly different - in case of collection you can calculate aggregated value right away. In case of streams you will need update your results when new input message will appear.
+
+### Techniques of processing streams
+
+There are multiple types of stream processing applications:
+
+**Single event processing**. Also refered as a map-filter operation. It is that type of application when you are processing messages one by one - filtering out not needed and applying transformation on the rest. For those type of messages it is easy to recover after crash. Application need just to start processing data from last processed one.
+
+**Processing with local state**. This kind of applications allows us to do so called windowed aggregations (we will cover concept of *aggregation* and *windows* later). Application need to have some sort of local state that allows to remember message values from the past in order to combine those with new messages. It might be tricky to recover after crash, because we will neet to restore local state somehow.
+
+**Combine results from multiple parts** This kind of processing might be considered similar to map-reduce type of algorithms. We process small chunks of data and later we will combine results.
+
+**Stream-Table joins** In other words - we are processing stream and we need to lookup some other resources (like database) in order to enrich messages. This approach is challenging because stream processing is fast, but database lookup is slow. It is crucial to have some sort of caching, or ability to process database in some other form.
+
+**Stream joins** This is the kind of application when we need to join multiple streams in order to calculate results. It is non trivial tasks, because we need to answer lots of difficult questions like - how to match data from both streams? 
+
+There are some common problems that we will writing stream processing apps:
+- how to handle out of sequence events?
+- how to handle reprocessing?
+
+### Kafka streams ###
+
+Kafka streams API allows us to build stream processing application on the top of existing Kafka infrastrudcture. Big advantage of kafka streams API is that it can be distributed as regular java application - when it will be started it will recognize itself current kafka setup and if there are more instances of application and everything will coordinate itself.
+
+Kafka streams features:
+- scalable
+- support for exactly once delivery
+- stateful/stateless processing
+- event-time processing
+- you need only kafka cluster running somewhere
+- high throughput
+
+There are two APIs for Kafka Streams
+- Streams DSL (high level API)
+- Processor API (low level - not covered by this workshops)
+
 ## Exercises - Introduction
 
 Exercises in this workshops are designed as series of unit tests when there is a blank spot where one should provides implementation that allows test to pass. From technical point of view those are tests that are using MockStreams (https://github.com/jpzk/mockedstreams) library that allows you to unit test your topologies.
