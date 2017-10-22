@@ -1,5 +1,7 @@
 # Workshops: Kafka Streams
 
+The goal of this workshops is to cover important concepts of Kafka Stream library and to "experience" some of those concepts with bunch of simple rather than hard exercises. Some parts of Kafka Stream is intentionaly omitted (low level processor API, interactive queries, admin stuff)
+
 ## General concepts
 
 Before we will start the real workshops - let's start with some concepts that would be nice to know.
@@ -348,3 +350,28 @@ As a result of windowed aggregation you will get `KTable[Windowed[K], V]` object
 This task is basically the same as previous, but here we will count averages for 5h hopping windows with interval of 4h (so so part of windows will be overlaping). It is just a matter of create window with `TimeWindows.of(...).advanceBy(...)` **instead** of just calling `TimeWindows.of(...)`. 
 
 It is much much more important to understand overlaping of the windows, so try to add `print()` or `peek()` call at some point that allows you to see not only data but allso information about windows
+
+## Exercise 5 - Joins
+
+### Joins
+
+Joins operation allows to combine data from two sources - streams or tables (or combination of both).
+
+For joins you need to co-partition data to be sure that the same keys are going to the same partitions for both sources. Because join will take message from the same partition from both topics. If data would be in different partitions - the different tasks will get the data and correct join will be impossible. The only one case when co-partitioning is not needed is the both topics have the same number of topics and the same partitioning strategy. Kafka streams is able to verify only that both topics have the same number of partitions and can throw exception on incorrect setup, but it cannot verify partition strategies
+
+Type of joins:
+- **KStream-KStream** - This is always windowed join, because unbounded join on streams will cause that internal store will grow indefinitely.
+- **KTable-KTable** - This is allways non-windowed join to mimic database join
+- **KStream-KTable** - This is allways non-windowed join. It is basically lookup for table on each new record in KStream.
+
+## Further readings
+
+- T. Akidau - The world beyond batch: Streaming 101 (https://www.oreilly.com/ideas/the-world-beyond-batch-streaming-101)
+- T. Akidau - The world beyond batch: Streaming 102 (https://www.oreilly.com/ideas/the-world-beyond-batch-streaming-102)
+- M. Noll - Distributed, Real-time Joins and Aggregations on User Activity Events using Kafka Streams (https://www.confluent.io/blog/distributed-real-time-joins-and-aggregations-on-user-activity-events-using-kafka-streams/)
+- N. Narkhede - Exactly-once Semantics are Possible: Here’s How Kafka Does it(https://www.confluent.io/blog/exactly-once-semantics-are-possible-heres-how-apache-kafka-does-it/)
+- all the things under the "sources"
+
+## Sources
+- G. Shapira, T. Palino, N. Narkhede - Kafka: The Definitive Guide (ch.11 - Stream Processing)
+- Kafka Streams documentation on confluent.io (https://docs.confluent.io/current/streams/index.html)
