@@ -30,7 +30,7 @@ Almost all "nodes" of topology allows you to execute `print` method on it. This 
 
 ### Exercise 1 - Hello world - other useful things
 
-TODO: peek method description
+There is other useful method that you can use for debuging. It is called `peek` and allows you to apply some operation on key-value pairs, so you can perform more advanced debuging - better printing, logging, applying some conditional logic, etc.
 
 ## Application scaffolding
 
