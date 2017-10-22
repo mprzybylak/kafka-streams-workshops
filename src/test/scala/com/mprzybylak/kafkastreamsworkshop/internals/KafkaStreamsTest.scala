@@ -32,14 +32,6 @@ class KafkaStreamsTest extends FlatSpec with Matchers {
     props
   }
 
-  protected def test(topologyBuilder: KStreamBuilder => Unit, in: Seq[(String, String)], out: Seq[(String, String)]): Unit = {
-    val strings: Serde[String] = Serdes.String()
-    MockedStreams()
-      .topology(topologyBuilder)
-      .input(INPUT_TOPIC_NAME, strings, strings, in)
-      .output(OUTPUT_TOPIC_NAME, strings, strings, out.size) shouldEqual out
-  }
-
   protected case class TemperatureMeasure(temperature: Int, timestamp: Long)
 
   protected object TemperatureMeasure {
