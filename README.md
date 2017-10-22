@@ -1,7 +1,5 @@
 # kafka-streams-worksops
 
-TODO: Before ex1. Explanation of topology, processor, source, sink
-
 ## Exercises - Introduction
 
 Exercises in this workshops are designed as series of unit tests when there is a blank spot where one should provides implementation that allows test to pass. From technical point of view those are tests that are using MockStreams (https://github.com/jpzk/mockedstreams) library that allows you to unit test your topologies.
@@ -36,6 +34,15 @@ There are two simple tasks:
 - get to know print method
 
 ### Topologies
+
+From the most general perspective - there are two things to do in order to create stream processing application with kafka streams:
+- Build the topology
+- Execute the topology
+
+Topology is set of computing steps (called processors), and transition between them. In oder words we can say that topology is a directed acyclic graph (DAG). We have three types of processors:
+- regular processors - those are the computing steps - for given input those will apply some logic and pass output to next processor.
+- source processors - those are the processors that will connect to input topic, consume messages from it and pass it to the next processor.
+- sink processors - those are the processors that will take input from another processor and write it to output topic.
 
 ### Creation of simple topology in Kafka Streams
 
