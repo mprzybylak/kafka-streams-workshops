@@ -153,6 +153,43 @@ Kafka streams allows you to use some set of serdes for most basic types by calli
 
 In case if you would like to have serialization/deserialization over your custom type you need to implements your own serdes. It is outside of the scope of this exercise, since all custom types and serdes are provided, but just to let you know how to do that: You need to have a class that implemnts `org.apache.kafka.common.serialization.Serde` interface. This class will act like factory for serializers and deserializers - you need also provide those by implementing interfaces: `org.apache.kafka.common.serialization.Serializer` and `org.apache.kafka.common.serialization.Deserializer`
 
+### Tables
+
+### Aggregation operations 
+
+To be able to perform aggregate operations you need to call one of the grouping method - more generic `group` or more specific `groupByKey`. With those method we will achieve two things:
+- We will distribute things that should be aggregated to correct partitions (which for example in case of `groupByKey` means nothing because data is already aligned this way, but with `groupBy` we can be more flexible)
+- We will get as a result `KGroupedStream[K,V]` that gives you an API for various aggregation operations
+
+Methods that will be needed for finish exercise are:
+- `count`
+- `reduce`
+
+The method `count` is very simple it will create `KTable` that will store pair key-count. There is nothing fancy about that.
+
+The method `reduce` is more general abstraction about aggregation operations. You need to pass function that will perform aggregation operation. It is how reduce method will use this function:
+- First first element from stream and second element from the stream will be taken and those will be pass to function.
+- Function will calculate result
+- Result of previous step and the next element from the stream will be taken and those will be pass to function
+- The previous step will be continued as long as there are elements in stream
+
+As a result `reduce` will create `KTable` that will store pair key-result or reduction.
+
+The most important thing about aggregation operation here is to understand how they works for streams as opose to regular collections. In case of collection the whole collection will be iterated and aggregated into the single aggregation result. For example let's imagine that we have collection of names and we would like to count each of them:
+
+Input collection will looks like this: `["John", "Jane", "Jane", "Jane", "John"]`
+The result of counting will looks like this: `[["John", 2], ["Jane", 3]]`
+
+But it is important to remember that **we cannot do that** in case of stream! Stream is unbounded, so potentialy infinite. We don't know if and when it will finish. So for stream we need to emit result of current state of aggregation for each new message. So in this case:
+
+Values in input streams will come in that order: `["John", "Jane", "Jane", "Jane", "John"]`
+We will emit result like this: `[["John", 1], ["Jane", 1], ["Jane", 2], ["Jane", 3], ["John, 2"]]`
+
+As mentioned before result of aggregation is stored inside `KTable` which basically means that we can see current state of aggreegation at some point of time.
+
+
+### Stores
+
 ### Methods to know
 
 ### EX
