@@ -364,6 +364,10 @@ Type of joins:
 - **KTable-KTable** - This is allways non-windowed join to mimic database join
 - **KStream-KTable** - This is allways non-windowed join. It is basically lookup for table on each new record in KStream.
 
+### TODO Exercises
+
+TODO exercises description
+
 ## Further readings
 
 - T. Akidau - The world beyond batch: Streaming 101 (https://www.oreilly.com/ideas/the-world-beyond-batch-streaming-101)
