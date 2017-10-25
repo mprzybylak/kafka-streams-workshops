@@ -1,10 +1,10 @@
 # Workshops: Kafka Streams
 
-The goal of this workshops is to cover important concepts of Kafka Stream library and to "experience" some of those concepts with bunch of simple rather than hard exercises. Some parts of Kafka Stream is intentionaly omitted (low level processor API, interactive queries, admin stuff)
+The goal of this workshops is to cover important concepts about Kafka Stream library. And also and to "experience" some of those concepts with bunch of simple exercises. Some concepts are intentionaly omitted (like: low level processor API, interactive queries, admin stuff)
 
 ## General concepts
 
-Before we will start the real workshops - let's start with some concepts that would be nice to know.
+Before we will start the real workshops - let's start with some of concepts that would be nice to know.
 
 ### Streams
 
@@ -13,7 +13,7 @@ In most general terms - stream is abstraction over unbound (infinite) data set. 
 - Immutable data
 - Replayable
 
-It is curcial to understand difference between processing data that is stream from processing data that looks like regular collection. First of all - in stream you don't know how much elements you have. Second thing is that you don't know when messages will appear on stream. Because of that you will need differently about some operations over stream than on the same operations over collections that you've already know.
+It is curcial to understand difference between processing data between streams and collections. First of all - in stream you don't know how much elements you have. Second thing is that you don't know when messages will appear on stream. Because of that you will need to think differently about some operations over stream than over collections.
 
 Especially aggregation operation looks totaly different - in case of collection you can calculate aggregated value right away. In case of streams you will need update your results when new input message will appear.
 
@@ -53,7 +53,7 @@ There are two APIs for Kafka Streams
 
 ### Kafka streams scalability ###
 
-How kafka streams scale the topology
+How kafka streams scale the topology?
 - Kafka streams scale application either by spliting into multiple threads or to scale between multiple machines
 - Kafka streams divide stream into tasks - task contain group of procesor that can work in parallel
 - Number of tasks depends on number of partitions
